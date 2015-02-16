@@ -261,6 +261,14 @@ public class TrainingItem extends AxisPoint {
         return powerItem.parse(v, ftp, "W");
 	}
 
+    public boolean setSlope(String v) {
+        if (powerItem != null) {
+            System.err.println("Power item already exist (" + powerItem.getDescr() + "), overwrite with new one!");
+        }
+        // TODO power from slope? Or just slope to avoid back-and-forth recomputations?
+        return false;
+    }
+
 
     public int getCadence() {
         if (cadItem != null) {

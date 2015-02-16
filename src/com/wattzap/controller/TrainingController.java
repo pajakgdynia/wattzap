@@ -273,6 +273,7 @@ public class TrainingController implements ActionListener, MessageCallback {
                     logger.error("Cannot delte journal file");
                 }
                 data.clear();
+                startTime = 0;
             }
         }
         if (noData) {

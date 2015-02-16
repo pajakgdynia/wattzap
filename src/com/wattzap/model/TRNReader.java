@@ -40,9 +40,11 @@ import org.jfree.data.xy.XYSeries;
 public class TRNReader extends RouteReader {
     // data to show in profile chart
 	private AxisPointsList<TrainingItem> training = null;
+    private int trainingType;
     private boolean providesCad;
     private boolean providesPower;
     private boolean providesHr;
+    private boolean providesSlope;
     private Map<SourceDataEnum, Integer> checks;
 
     @Override
@@ -93,6 +95,15 @@ public class TRNReader extends RouteReader {
                         boolean ok = false;
                         double t;
                         switch (columns.get(col)) {
+                            case "distance":
+                            case "km":
+                                t = parseDistance(f);
+                                item = new TrainingItem(routeLen);
+                                if (t > routeLen) {
+                                    routeLen = t;
+                                    ok = true;
+                                }
+                                break;
                             case "interval":
                             case "i":
                             case "int":
@@ -107,7 +118,7 @@ public class TRNReader extends RouteReader {
                             case "t":
                                 t = parseTime(f);
                                 item = new TrainingItem(t);
-                                if (t > routeLen) {
+                                if ((t > routeLen) || (t < 0.001) && (routeLen < 0.001)) {
                                     routeLen = t;
                                     ok = true;
                                 }
@@ -141,6 +152,13 @@ public class TRNReader extends RouteReader {
                                 }
                                 providesCad = true;
                                 ok = item.setCadence(f);
+                                break;
+                            case "slope":
+                                if (item == null) {
+                                    break;
+                                }
+                                providesSlope = true;
+                                ok = item.setSlope(f);
                                 break;
                             case "comment":
                             case "msg":
@@ -200,6 +218,14 @@ public class TRNReader extends RouteReader {
         return null;
     }
 
+    private double parseDistance(String f) {
+        try {
+            return Double.parseDouble(f);
+        } catch (NumberFormatException nfe) {
+            return -1.0;
+        }
+    }
+
     private double parseTime(String f) {
         String[] fields = f.split(":");
         try {
@@ -241,9 +267,11 @@ public class TRNReader extends RouteReader {
 
     @Override
     public void close() {
+        trainingType = 0;
         providesPower = false;
         providesCad = false;
         providesHr = false;
+        providesSlope = false;
         training = null;
         checks = null;
     }
