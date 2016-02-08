@@ -114,6 +114,7 @@ public class Profile extends JPanel implements MessageCallback, ChartMouseListen
     private String yKey = null;
     private double distance = 0.0;
     private Map<Integer, ValueMarker> opponents = new HashMap<>();
+    private XYSeries series = null;
 
 	public Profile() {
 		super();
@@ -125,6 +126,7 @@ public class Profile extends JPanel implements MessageCallback, ChartMouseListen
 		MessageBus.INSTANCE.register(Messages.GPXLOAD, this);
 		MessageBus.INSTANCE.register(Messages.PROFILE, this);
 		MessageBus.INSTANCE.register(Messages.OPPONENTS, this);
+		MessageBus.INSTANCE.register(Messages.CONFIG_CHANGED, this);
 	}
 
     private void handleClick(Point point) {
@@ -158,6 +160,11 @@ public class Profile extends JPanel implements MessageCallback, ChartMouseListen
 	public void callback(Messages message, Object o) {
         boolean rebuildSeries = false;
         switch (message) {
+        case CONFIG_CHANGED:
+            if ((UserPreferences) o == UserPreferences.HIDE_DESCR) {
+                rebuildSeries = true;
+            }
+            break;
         case OPPONENTS:
             if (plot == null) {
                 break;
@@ -203,21 +210,21 @@ public class Profile extends JPanel implements MessageCallback, ChartMouseListen
 
         case CLOSE:
             rebuildSeries = true;
-            o = null;
+            series = null;
             break;
         case GPXLOAD:
 			RouteReader routeData = (RouteReader) o;
             rebuildSeries = true;
-            o = routeData.getSeries();
+            series = routeData.getSeries();
             break;
 
         case PROFILE:
             rebuildSeries = true;
+            series = (XYSeries) o;
             break;
         }
 
         if (rebuildSeries) {
-            XYSeries series = (XYSeries) o;
 			if (chartPanel != null) {
 				remove(chartPanel);
                 chartPanel.removeChartMouseListener(this);
@@ -247,13 +254,14 @@ public class Profile extends JPanel implements MessageCallback, ChartMouseListen
                 xKey = key.substring(0, index);
                 yKey = key.substring(index + 1);
             }
+            boolean hide = UserPreferences.HIDE_DESCR.getBool();
 
 			// create the chart...
 			XYDataset xyDataset = new XYSeriesCollection(series);
 			final JFreeChart chart = ChartFactory.createXYAreaChart(
 					null,
-					MsgBundle.getString(xKey), // domain axis label
-					MsgBundle.getString(yKey), // range axis label
+					hide ? null : MsgBundle.getString(xKey), // domain axis label
+					hide ? null : MsgBundle.getString(yKey), // range axis label
 					xyDataset, // data
 					PlotOrientation.VERTICAL, // orientation
 					false, // include legend

@@ -156,8 +156,20 @@ public enum TelemetryProvider implements MessageCallback
 
     private void configChanged(UserPreferences pref) {
         if ((pref == UserPreferences.INSTANCE) ||
+                (pref == UserPreferences.CADENCE_SOURCE)) {
+            setSensor(SourceDataEnum.CADENCE, UserPreferences.CADENCE_SOURCE);
+        }
+        if ((pref == UserPreferences.INSTANCE) ||
                 (pref == UserPreferences.POWER_SOURCE)) {
             setSensor(SourceDataEnum.POWER, UserPreferences.POWER_SOURCE);
+        }
+        if ((pref == UserPreferences.INSTANCE) ||
+                (pref == UserPreferences.TARGET_POWER_SOURCE)) {
+            setSensor(SourceDataEnum.TARGET_POWER, UserPreferences.TARGET_POWER_SOURCE);
+        }
+        if ((pref == UserPreferences.INSTANCE) ||
+                (pref == UserPreferences.HR_SOURCE)) {
+            setSensor(SourceDataEnum.HEART_RATE, UserPreferences.HR_SOURCE);
         }
         if ((pref == UserPreferences.INSTANCE) ||
                 (pref == UserPreferences.SPEED_SOURCE)) {
@@ -341,6 +353,7 @@ public enum TelemetryProvider implements MessageCallback
                 switch (prop) {
                     case WHEEL_SPEED:
                     case SPEED:
+                    case TARGET_POWER:
                         if (value < 0.0) {
                             validity = TelemetryValidityEnum.NOT_PRESENT;
                             value = 0.0;

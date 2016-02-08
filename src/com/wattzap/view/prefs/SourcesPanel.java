@@ -49,6 +49,8 @@ public class SourcesPanel extends ConfigPanel {
 
         add(new ConfigFieldSourceSelector(this, UserPreferences.POWER_SOURCE,
                 "power_source", SourceDataEnum.POWER));
+        add(new ConfigFieldSourceSelector(this, UserPreferences.TARGET_POWER_SOURCE,
+                "target_power_source", SourceDataEnum.TARGET_POWER));
         add(new ConfigFieldInt(this, UserPreferences.ROBOT_POWER, "robot_power", "W"));
 	}
 }

@@ -41,18 +41,24 @@ public class HeartRateSensor extends AntSensor {
         return 1;
     }
 
+    // there are strange "lost" heartbeats. It happens mostly near 160bpm..
     private final AntCumulativeComp hrComp = new AntCumulativeComp(
             4, 2, 2048, // max ticks between heart beat, min HR 30bpm
             6, 1, 4, // heartbeats per [s], max heart rate 240bpm
             8 // about 2s to get the average
     );
+    private int lastBeats = -1;
 
     @Override
     public void storeReceivedData(long time, int[] data) {
-        double compRate = hrComp.compute(time, data);
-        if (compRate > 0.0) {
-            setValue(SourceDataEnum.HEART_RATE, compRate * 60.0);
+        if (lastBeats != data[6]) {
+            setValue(SourceDataEnum.HEART_RATE, data[7]);
+            lastBeats = data[6];
         }
+        //double compRate = hrComp.compute(time, data);
+        //if (compRate > 0.0) {
+        //    setValue(SourceDataEnum.HEART_RATE, compRate * 60.0);
+        //}
     }
 
     @Override

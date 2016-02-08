@@ -46,6 +46,7 @@ public class TrainingItem extends AxisPoint {
 	private ItemValue hrItem = null;
     private ItemValue powerItem = null;
     private ItemValue cadItem = null;
+    private ItemValue slopeItem = null;
 
     public TrainingItem(double time) {
         super(time);
@@ -217,6 +218,9 @@ public class TrainingItem extends AxisPoint {
         }
         return 0;
 	}
+
+
+
     private class PowerItemValue extends ItemValue {
         @Override
         public boolean parseValue(String str, double val, String unit) {
@@ -261,12 +265,46 @@ public class TrainingItem extends AxisPoint {
         return powerItem.parse(v, ftp, "W");
 	}
 
+    private class SlopeItemValue extends ItemValue {
+        public boolean parseSlope(String str, String unit) {
+            if (!parseDouble(str, unit)) {
+                return false;
+            }
+            descr = "" + avg + "%";
+            return true;
+        }
+        @Override
+        public boolean parseValue(String str, double val, String unit) {
+            return
+                    parseSlope(str, "%") || // 23%
+                    parseSlope(str, ""); // 23 (%)
+        }
+    }
+    public int getSlope() {
+        if (slopeItem != null) {
+            return (int) slopeItem.getAvg();
+        } else {
+            return 0;
+        }
+	}
+	public String getSlopeMsg() {
+        if (slopeItem != null) {
+            return slopeItem.getDescr();
+        } else {
+            return "";
+        }
+	}
     public boolean setSlope(String v) {
         if (powerItem != null) {
-            System.err.println("Power item already exist (" + powerItem.getDescr() + "), overwrite with new one!");
+            System.err.println("Cannot mix slope and power");
+            return false;
         }
-        // TODO power from slope? Or just slope to avoid back-and-forth recomputations?
-        return false;
+        if (slopeItem != null) {
+            System.err.println("Slope item already exist (" + slopeItem.getDescr() + "), overwrite with new one!");
+        }
+        slopeItem = new SlopeItemValue();
+        // slope.. only value is handled. Ranges are not handled!
+        return slopeItem.parseValue(v, 0, null);
     }
 
 

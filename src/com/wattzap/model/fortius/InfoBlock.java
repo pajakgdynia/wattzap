@@ -58,7 +58,7 @@ public class InfoBlock {
         os.writeInt(recordSize);
     }
 
-    private String blockType() {
+    public String blockType() {
         switch (blockFingerprint) {
             case LAP_DATA:
                 return "lap_data";

@@ -68,7 +68,10 @@ public enum SourceDataEnum {
     VIDEO_RATE("video_rate", 1.0, -5, "%"),
 
     // "ghost" distance
-    OPPONENT_DIST("opponent_distance", 0.0, 3, "km", "M", Constants.KMTOMILES);
+    OPPONENT_DIST("opponent_distance", 0.0, 3, "km", "M", Constants.KMTOMILES),
+
+    // CTF power meter, current zero-offset and currnet frequency
+    CTF_TORQUE_FREQUENCY("torque_frequency", 0.0, 0, "Hz");
 
     // formating stuff
     private static final char digits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};

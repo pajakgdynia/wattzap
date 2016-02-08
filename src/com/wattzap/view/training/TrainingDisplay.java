@@ -117,12 +117,10 @@ public class TrainingDisplay extends JPanel implements MessageCallback {
             addItem(descriptor, SourceDataEnum.CADENCE, Color.blue, 1.0);
 		}
 
-		if (reader != null) {
-			if (reader.provides(SourceDataEnum.TARGET_POWER)) {
-				Color lightOrange = new Color(255, 47, 19);
-                addItem(descriptor, SourceDataEnum.TARGET_POWER, lightOrange, 2.5);
-			}
+        Color lightOrange = new Color(255, 47, 19);
+        addItem(descriptor, SourceDataEnum.TARGET_POWER, lightOrange, 2.5);
 
+        if (reader != null) {
 			if (antEnabled) {
 				if (reader.provides(SourceDataEnum.TARGET_HR)) {
 					Color darkGreen = new Color(0, 110, 8);

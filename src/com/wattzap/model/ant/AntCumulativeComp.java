@@ -43,6 +43,7 @@ public class AntCumulativeComp {
     private int lastEvents;
     private long lastUpdate;
     private boolean lastValid;
+    private String name = null;
 
     /**
      *
@@ -120,8 +121,12 @@ public class AntCumulativeComp {
     }
 
     public String getName() {
-        return null;
+        return name;
     }
+    public void setName(String name) {
+        this.name = name;
+    }
+
 
     public final void restart() {
         lastValid = false;

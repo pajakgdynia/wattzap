@@ -49,6 +49,17 @@ public class TacxStream {
         number = 0;
     }
 
+    public void skipBlocks(InfoBlock infoBlock) {
+        System.out.println("Skip " + infoBlock.getRecordCount() + " block(s) of type "
+                + infoBlock.blockType() + "[" + infoBlock.getBlockFingerprint() + "] (block size "
+                + infoBlock.getRecordSize() + ")");
+        for (int i = 0; i < infoBlock.getRecordCount() * infoBlock.getRecordSize(); i++) {
+            readByte();
+        }
+        this.number = 0;
+    }
+
+
     public int readByte() {
         int b;
         try {

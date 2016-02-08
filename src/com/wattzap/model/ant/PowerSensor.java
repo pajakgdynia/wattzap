@@ -28,6 +28,14 @@ public class PowerSensor extends AntSensor {
 	private static final int POWER_DEVICE_TYPE = 11; // 0x0B
 
     private int eventCount = -1;
+    private int zeroOffset = 500;
+    private boolean ctfAutoZero;
+
+    /*
+    private int torqueTime = 0;
+    private int ctfEvents = -1;
+    private int torqueTicks;
+    */
 
     @Override
     public int getSensorType() {
@@ -49,13 +57,28 @@ public class PowerSensor extends AntSensor {
             2, 1, 16, // max wheel rotations per second, max speed ~120km/h
             6 // about 1.5s to get the average
     );
+    private final AntCumulativeComp torqueComp = new AntCumulativeComp(
+            2000, // ticks per second
+            16, 8000, // 16 bits for ticks, but 8000 ticks allowed
+            16, 2500, // 16 bits for torque impulses, but only power ~4kW allowe (offset 500 + slope 25 * 80)
+            2 // 3 events to get proper value..
+    );
+    private final AntCumulativeComp cadenceComp = new AntCumulativeComp(
+            2000, // ticks per second
+            16, 8000, // 16 bits for ticks, but 8000 ticks allowed
+            8, 5, // 8 bits for rotations, 300RPM is the max
+            2 // 3 events to get proper value..
+    );
+
     // wheel circumference [m], taken from configuration
     double wheelSize = 1.496;
 
     @Override
     public void storeReceivedData(long time, int[] data) {
         double speed;
-        // torque, smoothness, pedal balance, etc are not used.
+        double frequency;
+        double cadence;
+
         switch (data[0]) {
             // Standard Power-Only
             case 0x10:
@@ -86,8 +109,34 @@ public class PowerSensor extends AntSensor {
             // Standard Crank Torque
             case 0x12:
                 // power measured on crank, delivers only cadence
+                // It is not computed via computations, just reports this value
                 if (data[3] != 255) {
                     setValue(SourceDataEnum.CADENCE, data[3]);
+                }
+                break;
+
+            // CTF calibration data, changed automatically when autoZero is set.
+            case 0x01:
+                if ((data[1] == 0x10) && (data[2] ==0x01) && ctfAutoZero) {
+                    UserPreferences.CTF_ZERO_OFFSET.setInt((data[6] << 8) + data[7]);
+                }
+                break;
+            case 0x20:
+                frequency = torqueComp.compute(time, (data[4] << 8) + data[5], (data[6] << 8) + data[7]);
+                if (frequency > 0.0) {
+                    setValue(SourceDataEnum.CTF_TORQUE_FREQUENCY, frequency);
+                }
+
+                cadence = cadenceComp.compute(time, (data[4] << 8) + data[5], data[1]);
+                if (cadence > 0.0) {
+                    setValue(SourceDataEnum.CADENCE, cadence * 60);
+                }
+                if ((frequency > 0.0) && (cadence > 0.0)) {
+                    int slope = (data[2] << 8) + data[3];
+                    double torque = (frequency - zeroOffset) / (slope / 10.0);
+                    double power = torque * cadence * 2.0 * 3.141519;
+                    setValue(SourceDataEnum.POWER, power);
+                    setValue(SourceDataEnum.TARGET_POWER, power);
                 }
                 break;
         }
@@ -96,9 +145,11 @@ public class PowerSensor extends AntSensor {
     @Override
     public boolean provides(SourceDataEnum data) {
         switch (data) {
-            case POWER:
             case WHEEL_SPEED:
+            case POWER:
             case CADENCE:
+            case CTF_TORQUE_FREQUENCY:
+            case TARGET_POWER:
                 return true;
             default:
                 return false;
@@ -107,6 +158,20 @@ public class PowerSensor extends AntSensor {
 
     @Override
     public void configChanged(UserPreferences property) {
-        wheelSize = property.getWheelsize() / 1000.0;
+        if ((property == UserPreferences.WHEEL_SIZE) ||
+            (property == UserPreferences.INSTANCE))
+        {
+            wheelSize = property.getWheelsize() / 1000.0;
+        }
+        if ((property == UserPreferences.CTF_OFFSET_AUTO_ZERO) ||
+            (property == UserPreferences.INSTANCE))
+        {
+            ctfAutoZero = property.ctfOffsetAutoZero();
+        }
+        if ((property == UserPreferences.CTF_ZERO_OFFSET) ||
+            (property == UserPreferences.INSTANCE))
+        {
+            zeroOffset = property.ctfZeroOffset();
+        }
     }
 }

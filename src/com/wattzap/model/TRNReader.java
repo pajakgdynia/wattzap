@@ -277,8 +277,9 @@ public class TRNReader extends RouteReader {
     }
 
     /**
-     * Reader calculates only TARGET values (power, cadence and HR). These are
+     * Reader calculates TARGET values (power, cadence and HR). These are
      * shown in training chart.
+     * Slope excludes TARGET_POWER.
      */
     @Override
     public boolean provides(SourceDataEnum data) {
@@ -292,6 +293,8 @@ public class TRNReader extends RouteReader {
                 return providesCad;
             case TARGET_HR:
                 return providesHr;
+            case SLOPE:
+                return providesSlope;
         }
         return false;
     }
@@ -336,6 +339,10 @@ public class TRNReader extends RouteReader {
         if (providesHr) {
             setValue(SourceDataEnum.TARGET_HR, item.getHr());
             checks.put(SourceDataEnum.HEART_RATE, item.isHRInRange(t.getHeartRate()));
+        }
+        if (providesSlope) {
+            setValue(SourceDataEnum.SLOPE, item.getSlope());
+            // nothning is checked, it is timed training only
         }
     }
 

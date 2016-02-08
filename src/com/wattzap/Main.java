@@ -220,6 +220,7 @@ public class Main implements Runnable {
         // Preferences
 		JMenuItem prefMenuItem = new JMenuItem(MsgBundle.getString("preferences"));
 		Preferences preferences = new Preferences();
+		prefMenuItem.setActionCommand(Preferences.SHOW);
 		prefMenuItem.addActionListener(preferences);
 		appMenu.add(prefMenuItem);
 

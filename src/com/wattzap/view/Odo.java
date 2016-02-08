@@ -61,6 +61,7 @@ public class Odo extends JPanel implements MessageCallback {
         assert colors.length == TelemetryValidityEnum.values().length :
                 "Wrong number of colors for validity";
     }
+    private boolean ctfDataShown;
 
     private class ValueCol {
         private final SourceDataEnum sourceData;
@@ -210,7 +211,15 @@ public class Odo extends JPanel implements MessageCallback {
             }
         });
 
-        // chronometer
+        // CTF power properties
+        columns.add(new ValueCol(SourceDataEnum.CTF_TORQUE_FREQUENCY) {
+            @Override
+            public boolean shown(Telemetry t) {
+                return ctfDataShown;
+            }
+        });
+
+        // video rate
         columns.add(new ValueCol(SourceDataEnum.VIDEO_RATE));
         // chronometer
         columns.add(new ValueCol(SourceDataEnum.TIME));
@@ -276,6 +285,11 @@ public class Odo extends JPanel implements MessageCallback {
                     (pref == UserPreferences.INSTANCE))
                 {
                     wheelSpeedShown = pref.isWheelSpeedVisible();
+                }
+                if ((pref == UserPreferences.CTF_TORQUE_VISIBLE) ||
+                    (pref == UserPreferences.INSTANCE))
+                {
+                    ctfDataShown = pref.ctfTorqueVisible();
                 }
                 break;
         }

@@ -25,6 +25,8 @@ import java.util.UUID;
 import com.wattzap.model.dto.WorkoutData;
 import com.wattzap.model.power.Power;
 import com.wattzap.model.power.PowerProfiles;
+import com.wattzap.view.prefs.GenLocationEnum;
+import com.wattzap.view.prefs.TrainingLocationEnum;
 import java.util.ArrayList;
 
 /**
@@ -41,7 +43,8 @@ public enum UserPreferences {
     SPEED_SOURCE("speed_source", "speed2power"),
     CADENCE_SOURCE("cadence_source", "sandc"),
     HR_SOURCE("hr_source", "hrm"),
-    POWER_SOURCE("power_source", "sandc"),
+    POWER_SOURCE("power_source", "robot"),
+    TARGET_POWER_SOURCE("target_power_source", "sandc"),
 
     DEBUG("debug", true),
     MAX_POWER("maxpower", 250), // FTP..
@@ -97,9 +100,18 @@ public enum UserPreferences {
     INFO_VISIBLE("info_visible", true, 1),
     ODO_VISIBLE("odo_visible", false, -1),
 
+    TRAINING_LOCATION("training_location", TrainingLocationEnum.MAIN_WINDOW.getLoc()),
+    MAP_LOCATION("map_location", GenLocationEnum.MAIN_WINDOW.getKey()),
+    PROFILE_LOCATION("profile_location", GenLocationEnum.MAIN_WINDOW.getKey()),
+
     MANUAL_PAUSE("manual_pause", false),
     SHOW_SLOPE("show_slope", false),
+    HIDE_DESCR("hide_descr", false),
     MARKER_VISIBLE("marker_visible", false),
+
+    CTF_TORQUE_VISIBLE("ctf_torque_visible", false),
+    CTF_OFFSET_AUTO_ZERO("ctf_auto_zero", false),
+    CTF_ZERO_OFFSET("ctf_zero_offset", 500),
 
     // "backward" compability, cannot be get/set, general value for all settings
 	INSTANCE;
@@ -517,6 +529,25 @@ public enum UserPreferences {
     public boolean autostart() {
         return AUTO_START.getBool();
     }
+
+
+    public TrainingLocationEnum getTrainingLocation() {
+        return TrainingLocationEnum.get(TRAINING_LOCATION.getInt());
+    }
+    public void setTrainingLocation(TrainingLocationEnum where) {
+        TRAINING_LOCATION.setInt(where.getLoc());
+    }
+
+    public boolean ctfOffsetAutoZero() {
+        return CTF_OFFSET_AUTO_ZERO.getBool();
+    }
+    public boolean ctfTorqueVisible() {
+        return CTF_TORQUE_VISIBLE.getBool();
+    }
+    public int ctfZeroOffset() {
+        return CTF_ZERO_OFFSET.getInt();
+    }
+
 
     public boolean slopeShown() {
         return SHOW_SLOPE.getBool();

@@ -22,10 +22,10 @@ package com.wattzap.model.dto;
  */
 public abstract class ItemValue {
     // if min/max are not set, +- 5% are set for values
-    private double min = -1.0;
-    private double avg = -1.0;
-    private double max = -1.0;
-    private String descr = null;
+    protected double min = -1.0;
+    protected double avg = -1.0;
+    protected double max = -1.0;
+    protected String descr = null;
 
     // any; value "-" value or value ".." value
     public boolean parseRange(String str, double val, String unit) {
@@ -128,7 +128,7 @@ public abstract class ItemValue {
 
 
     // General calculations
-    private boolean parseInt(String str, String unit) {
+    protected boolean parseInt(String str, String unit) {
         if (str.toLowerCase().endsWith(unit)) {
             try {
                 avg = Integer.parseInt(str.substring(0, str.length() - unit.length()));
@@ -140,7 +140,7 @@ public abstract class ItemValue {
             return false;
         }
     }
-    private boolean parseDouble(String str, String unit) {
+    protected boolean parseDouble(String str, String unit) {
         if (str.toLowerCase().endsWith(unit)) {
             try {
                 avg = Double.parseDouble(str.substring(0, str.length() - unit.length()));

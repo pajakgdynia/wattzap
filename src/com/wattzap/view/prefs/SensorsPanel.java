@@ -79,6 +79,10 @@ public class SensorsPanel extends ConfigPanel {
             }
         });
 
+        // CTF power meter settings
+        add(new ConfigFieldCheck(this, UserPreferences.CTF_OFFSET_AUTO_ZERO, "ctf_offset_auto_zero"));
+        add(new ConfigFieldInt(this, UserPreferences.CTF_ZERO_OFFSET, "zero_offset", "Hz"));
+
         // sensor builder, it consist of two lines:
         // - radio, name edit field, combo with type
         // - add/update/remove buttons

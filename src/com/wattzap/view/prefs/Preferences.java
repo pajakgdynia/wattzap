@@ -40,6 +40,9 @@ import javax.swing.JPanel;
 
 public class Preferences extends JFrame implements ActionListener {
 
+    public static final String SHOW = "preferences";
+    public static final String HIDE = "close";
+
     public Preferences() {
 		setTitle("Preferences");
 		ImageIcon img = new ImageIcon("icons/preferences.jpg");
@@ -55,6 +58,8 @@ public class Preferences extends JFrame implements ActionListener {
 
 		// Personal Data
         jtp.addTab(MsgBundle.getString("personal_data"), new UserPanel());
+		// Windows placement and configuration
+        jtp.addTab(MsgBundle.getString("placements"), new WindowsPanel());
 		// ANT+ Pairing
         jtp.addTab(MsgBundle.getString("sensors"), new SensorsPanel());
 		// Trainer Profiles
@@ -67,7 +72,7 @@ public class Preferences extends JFrame implements ActionListener {
 
 		JButton closeButton = new JButton(MsgBundle.getString("close"));
 		closeButton.setPreferredSize(new Dimension(120, 30));
-		closeButton.setActionCommand("close");
+		closeButton.setActionCommand(HIDE);
 		closeButton.addActionListener(this);
 
         buttonPanel.add(closeButton);
@@ -81,10 +86,10 @@ public class Preferences extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
-        if (MsgBundle.getString("preferences").equals(command)) {
+        if (SHOW.equals(command)) {
 			setVisible(true); // you can see me (again)!
         }
-		if (MsgBundle.getString("close").equals(command)) {
+		if (HIDE.equals(command)) {
 			setVisible(false); // you can't see me!
 			dispose();
 		}
